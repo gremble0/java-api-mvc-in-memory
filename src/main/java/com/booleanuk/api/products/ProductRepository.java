@@ -25,4 +25,12 @@ public class ProductRepository {
 
     return product;
   }
+
+  public Optional<Product> updateById(int id, UnidentifiedProduct newProduct) {
+    return this.getById(id)
+        .map(oldProduct -> {
+          this.products.remove(oldProduct);
+          return this.create(newProduct.name(), newProduct.category(), newProduct.price());
+        });
+  }
 }
