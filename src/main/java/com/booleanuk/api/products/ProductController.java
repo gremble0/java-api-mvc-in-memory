@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductController {
   private ProductRepository repository = new ProductRepository();
 
+  // TODO: ResponseEntity<Product> instead of '?'
   @PostMapping
   public ResponseEntity<?> create(@RequestBody UnidentifiedProduct product) {
     Optional<Product> productWithId = this.repository.create(product.name(), product.category(), product.price());
@@ -27,13 +29,17 @@ public class ProductController {
     if (productWithId.isEmpty())
       return new ResponseEntity<>("Product with provided name already exists", HttpStatus.BAD_REQUEST);
     else
-      return new ResponseEntity<>(productWithId, HttpStatus.CREATED);
+      return new ResponseEntity<>(productWithId.get(), HttpStatus.CREATED);
   }
 
   @GetMapping
-  @ResponseStatus(HttpStatus.OK)
-  public List<Product> getAll() {
-    return this.repository.getAll();
+  public ResponseEntity<?> getCategoryOrAll(@RequestParam(required = false) String category) {
+    Optional<List<Product>> ofCategory = this.repository.getAllOfCategory(category);
+
+    if (ofCategory.isEmpty())
+      return new ResponseEntity<>(this.repository.getAll(), HttpStatus.NOT_FOUND);
+    else
+      return new ResponseEntity<>(ofCategory, HttpStatus.OK);
   }
 
   @GetMapping(value = "/{id}")

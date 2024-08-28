@@ -12,8 +12,23 @@ public class ProductRepository {
     return this.products;
   }
 
+  public Optional<List<Product>> getAllOfCategory(String category) {
+    List<Product> ofCategory = this.products
+        .stream()
+        .filter(product -> product.category().equals(category))
+        .toList();
+
+    if (ofCategory.size() == 0)
+      return Optional.empty();
+    else
+      return Optional.of(ofCategory);
+  }
+
   public Optional<Product> create(String name, String category, int price) {
-    if (this.products.stream().filter(product -> product.name().equals(name)).findAny().isPresent())
+    if (this.products.stream()
+        .filter(product -> product.name().equals(name))
+        .findAny()
+        .isPresent())
       return Optional.empty();
 
     Product product = new Product(this.idCounter++, name, category, price);
@@ -41,6 +56,7 @@ public class ProductRepository {
   }
 
   public Optional<Product> removeById(int id) {
+
     return this.getById(id)
         .map(productToremove -> {
           this.products.remove(productToremove);
