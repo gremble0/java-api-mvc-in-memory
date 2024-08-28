@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -54,12 +53,19 @@ public class ProductController {
 
   @PutMapping(value = "/{id}")
   public ResponseEntity<?> updateById(@PathVariable int id, @RequestBody UnidentifiedProduct newProduct) {
-    Optional<Product> product = this.repository.updateById(id, newProduct);
+    Optional<Product> oldProduct = this.repository.removeById(id);
 
-    if (product.isEmpty())
+    if (oldProduct.isEmpty())
       return new ResponseEntity<>("No product with id '" + id + "' found", HttpStatus.NOT_FOUND);
+
+    Optional<Product> createdProduct = this.repository.create(newProduct.name(), newProduct.category(),
+        newProduct.price());
+
+    if (createdProduct.isEmpty())
+      return new ResponseEntity<>("Product with name '" + newProduct.name() + "' already exists",
+          HttpStatus.BAD_REQUEST);
     else
-      return new ResponseEntity<>(product.get(), HttpStatus.OK);
+      return new ResponseEntity<>(createdProduct.get(), HttpStatus.OK);
   }
 
   @DeleteMapping(value = "/{id}")

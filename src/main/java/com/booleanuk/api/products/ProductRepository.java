@@ -44,19 +44,7 @@ public class ProductRepository {
         .findFirst();
   }
 
-  public Optional<Product> updateById(int id, UnidentifiedProduct newProduct) {
-    return this.getById(id)
-        .map(oldProduct -> {
-          Product newProductWithId = new Product(this.idCounter++, newProduct.name(), newProduct.category(),
-              newProduct.price());
-          this.products.remove(oldProduct);
-          this.products.add(newProductWithId);
-          return newProductWithId;
-        });
-  }
-
   public Optional<Product> removeById(int id) {
-
     return this.getById(id)
         .map(productToremove -> {
           this.products.remove(productToremove);
