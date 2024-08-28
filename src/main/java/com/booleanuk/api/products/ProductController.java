@@ -43,7 +43,6 @@ public class ProductController {
   }
 
   @GetMapping(value = "/{id}")
-  @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<?> getById(@PathVariable int id) {
     Optional<Product> product = this.repository.getById(id);
 
@@ -54,9 +53,13 @@ public class ProductController {
   }
 
   @PutMapping(value = "/{id}")
-  @ResponseStatus(HttpStatus.CREATED)
-  public Optional<Product> updateById(@PathVariable int id, @RequestBody UnidentifiedProduct newProduct) {
-    return this.repository.updateById(id, newProduct);
+  public ResponseEntity<?> updateById(@PathVariable int id, @RequestBody UnidentifiedProduct newProduct) {
+    Optional<Product> product = this.repository.updateById(id, newProduct);
+
+    if (product.isEmpty())
+      return new ResponseEntity<>("No product with id '" + id + "' found", HttpStatus.NOT_FOUND);
+    else
+      return new ResponseEntity<>(product.get(), HttpStatus.OK);
   }
 
   @DeleteMapping(value = "/{id}")
