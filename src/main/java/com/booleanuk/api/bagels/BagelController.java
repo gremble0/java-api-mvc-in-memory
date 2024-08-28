@@ -3,7 +3,7 @@ package com.booleanuk.api.bagels;
 import java.util.List;
 
 public class BagelController {
-    BagelRepository repository;
+    private BagelRepository repository;
 
     public BagelController(BagelRepository repository) {
         this.repository = repository;

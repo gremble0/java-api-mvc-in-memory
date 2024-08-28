@@ -18,7 +18,7 @@ public class BagelRepository {
 
     public Bagel find(int id) {
         return this.data.stream()
-                .filter(bagel -> bagel.getId() == id)
+                .filter(bagel -> bagel.id() == id)
                 .findFirst()
                 .orElseThrow();
     }
