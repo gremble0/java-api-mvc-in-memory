@@ -1,4 +1,9 @@
 package com.booleanuk.api.products;
 
-public record UnidentifiedProduct(String name, String category, int price) {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record UnidentifiedProduct(
+    @JsonProperty(required = true) String name,
+    @JsonProperty(required = true) String category,
+    @JsonProperty(required = true) int price) {
 }
