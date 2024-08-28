@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,9 +21,13 @@ public class ProductController {
   private ProductRepository repository = new ProductRepository();
 
   @PostMapping
-  @ResponseStatus(HttpStatus.CREATED)
-  public Product create(@RequestBody UnidentifiedProduct product) {
-    return this.repository.create(product.name(), product.category(), product.price());
+  public ResponseEntity<?> create(@RequestBody UnidentifiedProduct product) {
+    Optional<Product> productWithId = this.repository.create(product.name(), product.category(), product.price());
+
+    if (productWithId.isEmpty())
+      return new ResponseEntity<>("Product with provided name already exists", HttpStatus.BAD_REQUEST);
+    else
+      return new ResponseEntity<>(productWithId, HttpStatus.CREATED);
   }
 
   @GetMapping

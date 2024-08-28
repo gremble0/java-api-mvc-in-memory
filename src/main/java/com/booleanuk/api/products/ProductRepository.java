@@ -12,11 +12,14 @@ public class ProductRepository {
     return this.products;
   }
 
-  public Product create(String name, String category, int price) {
+  public Optional<Product> create(String name, String category, int price) {
+    if (this.products.stream().filter(product -> product.name().equals(name)).findAny().isPresent())
+      return Optional.empty();
+
     Product product = new Product(this.idCounter++, name, category, price);
     this.products.add(product);
 
-    return product;
+    return Optional.of(product);
   }
 
   public Optional<Product> getById(int id) {
@@ -27,11 +30,14 @@ public class ProductRepository {
   }
 
   public Optional<Product> updateById(int id, UnidentifiedProduct newProduct) {
-    Optional<Product> removed = this.removeById(id);
-    if (removed.isEmpty())
-      return Optional.empty();
-    else
-      return Optional.of(this.create(newProduct.name(), newProduct.category(), newProduct.price()));
+    return this.getById(id)
+        .map(oldProduct -> {
+          Product newProductWithId = new Product(this.idCounter++, newProduct.name(), newProduct.category(),
+              newProduct.price());
+          this.products.remove(oldProduct);
+          this.products.add(newProductWithId);
+          return newProductWithId;
+        });
   }
 
   public Optional<Product> removeById(int id) {
