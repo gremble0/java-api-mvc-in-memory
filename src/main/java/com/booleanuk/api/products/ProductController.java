@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,5 +41,11 @@ public class ProductController {
   @ResponseStatus(HttpStatus.CREATED)
   public Optional<Product> updateById(@PathVariable int id, @RequestBody UnidentifiedProduct newProduct) {
     return this.repository.updateById(id, newProduct);
+  }
+
+  @DeleteMapping(value = "/{id}")
+  @ResponseStatus(HttpStatus.OK)
+  public Optional<Product> removeById(@PathVariable int id) {
+    return this.repository.removeById(id);
   }
 }
