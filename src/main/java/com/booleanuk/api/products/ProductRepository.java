@@ -19,7 +19,10 @@ public class ProductRepository {
         .findFirst();
   }
 
-  public void create(String name, String category, int price) {
-    this.products.add(new Product(this.idCounter++, name, category, price));
+  public Product create(String name, String category, int price) {
+    Product product = new Product(this.idCounter++, name, category, price);
+    this.products.add(product);
+
+    return product;
   }
 }
