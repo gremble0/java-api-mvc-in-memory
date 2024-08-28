@@ -63,8 +63,12 @@ public class ProductController {
   }
 
   @DeleteMapping(value = "/{id}")
-  @ResponseStatus(HttpStatus.OK)
-  public Optional<Product> removeById(@PathVariable int id) {
-    return this.repository.removeById(id);
+  public ResponseEntity<?> removeById(@PathVariable int id) {
+    Optional<Product> product = this.repository.removeById(id);
+
+    if (product.isEmpty())
+      return new ResponseEntity<>("No product with id '" + id + "' found", HttpStatus.NOT_FOUND);
+    else
+      return new ResponseEntity<>(product.get(), HttpStatus.OK);
   }
 }
