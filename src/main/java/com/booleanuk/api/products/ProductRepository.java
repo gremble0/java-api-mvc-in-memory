@@ -21,7 +21,8 @@ public class ProductRepository {
   }
 
   /**
-   * @throws ResponseStatusException HTTP error 404
+   * @throws ResponseStatusException HTTP error 404 if no products of the given
+   *                                 category exists
    */
   public List<Product> getCategory(String category) throws ResponseStatusException {
     List<Product> ofCategory = this.products.stream()
@@ -38,7 +39,8 @@ public class ProductRepository {
   }
 
   /**
-   * @throws ResponseStatusException HTTP error 400
+   * @throws ResponseStatusException HTTP error 400 if product with
+   *                                 {@code productDTO.name()} exists
    */
   public Product create(ProductDTO productDTO) throws ResponseStatusException {
     if (this.productWithNameExists(productDTO.name()))
@@ -52,7 +54,8 @@ public class ProductRepository {
   }
 
   /**
-   * @throws ResponseStatusException HTTP error 404
+   * @throws ResponseStatusException HTTP error 404 if no product with the given
+   *                                 id exists
    */
   public Product getById(int id) throws ResponseStatusException {
     return this.products.stream()
@@ -62,7 +65,8 @@ public class ProductRepository {
   }
 
   /**
-   * @throws ResponseStatusException HTTP error 404
+   * @throws ResponseStatusException HTTP error 404 if no product with the given
+   *                                 id exists
    */
   public Product removeById(int id) throws ResponseStatusException {
     Product toRemove = this.getById(id);
@@ -71,7 +75,9 @@ public class ProductRepository {
   }
 
   /**
-   * @throws ResponseStatusException HTTP error 404 or 400
+   * @throws ResponseStatusException HTTP error 404 if no product with the given
+   *                                 id exists. HTTP error 400 if a product with
+   *                                 {@code productDTO.name()} already exists
    */
   public Product updateById(int id, ProductDTO productDTO) throws ResponseStatusException {
     if (this.productWithNameExists(productDTO.name()))
