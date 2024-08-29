@@ -22,7 +22,7 @@ public class ProductController {
 
   // TODO: ResponseEntity<Product> instead of '?'
   @PostMapping
-  public ResponseEntity<?> create(@RequestBody UnidentifiedProduct product) {
+  public ResponseEntity<?> create(@RequestBody ProductDTO product) {
     Optional<Product> productWithId = this.repository.create(product.name(), product.category(), product.price());
 
     if (productWithId.isEmpty())
@@ -52,7 +52,7 @@ public class ProductController {
   }
 
   @PutMapping(value = "/{id}")
-  public ResponseEntity<?> updateById(@PathVariable int id, @RequestBody UnidentifiedProduct newProduct) {
+  public ResponseEntity<?> updateById(@PathVariable int id, @RequestBody ProductDTO newProduct) {
     Optional<Product> oldProduct = this.repository.removeById(id);
 
     if (oldProduct.isEmpty())
