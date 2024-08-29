@@ -30,14 +30,15 @@ public class ProductRepository {
         .toList();
 
     if (ofCategory.size() == 0 && this.products.size() > 0)
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+          "No products of the provided category '" + category + "' were found");
     else
       return ofCategory;
   }
 
   public Product create(String name, String category, int price) throws ResponseStatusException {
     if (this.productWithNameExists(name))
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product with name '" + name + "' already exists");
 
     Product product = new Product(this.idCounter++, name, category, price);
     this.products.add(product);
@@ -51,7 +52,7 @@ public class ProductRepository {
         .filter(product -> product.id() == id)
         .findFirst()
         .orElseThrow(() -> {
-          throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product with id '" + id + "' not found");
         });
   }
 
@@ -64,7 +65,8 @@ public class ProductRepository {
 
   public Product updateById(int id, ProductDTO newProductDTO) throws ResponseStatusException {
     if (this.productWithNameExists(newProductDTO.name()))
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+          "Product with name '" + newProductDTO.name() + "' already exists");
 
     // Can throw 404
     Product oldProduct = this.getById(id);
@@ -76,6 +78,7 @@ public class ProductRepository {
     return newProduct;
   }
 
+  // Not part of the assignment
   public String getTeapotTag() {
     return ProductRepository.teapotTag;
   }
