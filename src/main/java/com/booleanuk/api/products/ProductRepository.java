@@ -11,16 +11,20 @@ public class ProductRepository {
   private List<Product> products = new ArrayList<>();
   private static final String teapotTag = "<img src='https://media2.giphy.com/media/ARmZmMqobLtZKrJRrU/200w.gif?cid=6c09b95287okszcbz59ao584wd835y08z53ju0u1pwjpok20&ep=v1_gifs_search&rid=200w.gif&ct=g'>";
 
-  public List<Product> getAll() {
-    return this.products;
-  }
-
   private boolean productWithNameExists(String name) {
     return this.products
         .stream()
         .filter(product -> product.name().equals(name))
         .findAny()
         .isPresent();
+  }
+
+  private Product productFromDTO(ProductDTO productDTO) {
+    return new Product(this.idCounter++, productDTO.name(), productDTO.category(), productDTO.price());
+  }
+
+  public List<Product> getAll() {
+    return this.products;
   }
 
   public List<Product> getCategory(String category) throws ResponseStatusException {
@@ -36,11 +40,12 @@ public class ProductRepository {
       return ofCategory;
   }
 
-  public Product create(String name, String category, int price) throws ResponseStatusException {
-    if (this.productWithNameExists(name))
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product with name '" + name + "' already exists");
+  public Product create(ProductDTO productDTO) throws ResponseStatusException {
+    if (this.productWithNameExists(productDTO.name()))
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+          "Product with name '" + productDTO.name() + "' already exists");
 
-    Product product = new Product(this.idCounter++, name, category, price);
+    Product product = this.productFromDTO(productDTO);
     this.products.add(product);
 
     return product;
@@ -63,16 +68,16 @@ public class ProductRepository {
     return toRemove;
   }
 
-  public Product updateById(int id, ProductDTO newProductDTO) throws ResponseStatusException {
-    if (this.productWithNameExists(newProductDTO.name()))
+  public Product updateById(int id, ProductDTO productDTO) throws ResponseStatusException {
+    if (this.productWithNameExists(productDTO.name()))
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-          "Product with name '" + newProductDTO.name() + "' already exists");
+          "Product with name '" + productDTO.name() + "' already exists");
 
     // Can throw 404
     Product oldProduct = this.getById(id);
     this.products.remove(oldProduct);
 
-    Product newProduct = new Product(id, newProductDTO.name(), newProductDTO.category(), newProductDTO.price());
+    Product newProduct = this.productFromDTO(productDTO);
     this.products.add(newProduct);
 
     return newProduct;

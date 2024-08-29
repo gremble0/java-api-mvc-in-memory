@@ -22,8 +22,8 @@ public class ProductController {
   private ProductRepository repository = new ProductRepository();
 
   @PostMapping
-  public ResponseEntity<Product> create(@RequestBody ProductDTO product) throws ResponseStatusException {
-    return new ResponseEntity<>(this.repository.create(product.name(), product.category(), product.price()),
+  public ResponseEntity<Product> create(@RequestBody ProductDTO productDTO) throws ResponseStatusException {
+    return new ResponseEntity<>(this.repository.create(productDTO),
         HttpStatus.CREATED);
   }
 
