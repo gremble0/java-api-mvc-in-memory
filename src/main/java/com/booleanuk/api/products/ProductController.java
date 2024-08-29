@@ -19,7 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping(value = "/products")
 public class ProductController {
-  private ProductRepository repository = new ProductRepository();
+  private final ProductRepository repository = new ProductRepository();
 
   @PostMapping
   public ResponseEntity<Product> create(@RequestBody ProductDTO productDTO) throws ResponseStatusException {
@@ -28,12 +28,11 @@ public class ProductController {
   }
 
   @GetMapping
-  public ResponseEntity<List<Product>> getCategoryOrAll(@RequestParam(required = false) Optional<String> category)
+  public ResponseEntity<List<Product>> getCategoryOrAll(@RequestParam(required = false) Optional<String> maybeCategory)
       throws ResponseStatusException {
-    if (category.isPresent())
-      return new ResponseEntity<>(this.repository.getCategory(category.get().toLowerCase()), HttpStatus.OK);
-    else
-      return new ResponseEntity<>(this.repository.getAll(), HttpStatus.OK);
+    return maybeCategory
+        .map(category -> new ResponseEntity<>(this.repository.getCategory(category.toLowerCase()), HttpStatus.OK))
+        .orElseGet(() -> new ResponseEntity<>(this.repository.getAll(), HttpStatus.OK));
   }
 
   @GetMapping(value = "/{id}")

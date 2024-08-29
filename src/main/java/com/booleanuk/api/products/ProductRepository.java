@@ -8,15 +8,13 @@ import org.springframework.web.server.ResponseStatusException;
 
 public class ProductRepository {
   private int idCounter = 0;
-  private List<Product> products = new ArrayList<>();
+  private final List<Product> products = new ArrayList<>();
   private static final String teapotTag = "<img src='https://media2.giphy.com/media/ARmZmMqobLtZKrJRrU/200w.gif?cid=6c09b95287okszcbz59ao584wd835y08z53ju0u1pwjpok20&ep=v1_gifs_search&rid=200w.gif&ct=g'>";
 
   private boolean productWithNameExists(String name) {
     return this.products
         .stream()
-        .filter(product -> product.name().equals(name))
-        .findAny()
-        .isPresent();
+        .anyMatch(product -> product.name().equals(name));
   }
 
   private Product productFromDTO(ProductDTO productDTO) {
@@ -33,7 +31,9 @@ public class ProductRepository {
         .filter(product -> product.category().equalsIgnoreCase(category))
         .toList();
 
-    if (ofCategory.size() == 0 && this.products.size() > 0)
+    // Not sure what to return if there are no products in the repository. Currently
+    // we return an empty list in this case, but we could also error.
+    if (ofCategory.isEmpty() && !this.products.isEmpty())
       throw new ResponseStatusException(HttpStatus.NOT_FOUND,
           "No products of the provided category '" + category + "' were found");
     else
@@ -56,9 +56,7 @@ public class ProductRepository {
         .stream()
         .filter(product -> product.id() == id)
         .findFirst()
-        .orElseThrow(() -> {
-          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product with id '" + id + "' not found");
-        });
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product with id '" + id + "' not found"));
   }
 
   public Product removeById(int id) throws ResponseStatusException {
