@@ -2,7 +2,6 @@ package com.booleanuk.api.products;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -13,6 +12,13 @@ public class ProductRepository {
 
   public List<Product> getAll() {
     return this.products;
+  }
+
+  private boolean productWithNameExists(String name) {
+    return this.products.stream()
+        .filter(product -> product.name().equals(name))
+        .findAny()
+        .isPresent();
   }
 
   public List<Product> getAllOfCategory(String category) throws ResponseStatusException {
@@ -28,10 +34,7 @@ public class ProductRepository {
   }
 
   public Product create(String name, String category, int price) throws ResponseStatusException {
-    if (this.products.stream()
-        .filter(product -> product.name().equals(name))
-        .findAny()
-        .isPresent())
+    if (this.productWithNameExists(name))
       throw new ResponseStatusException(HttpStatus.I_AM_A_TEAPOT);
 
     Product product = new Product(this.idCounter++, name, category, price);
@@ -53,5 +56,18 @@ public class ProductRepository {
     Product toRemove = this.getById(id);
     this.products.remove(toRemove);
     return toRemove;
+  }
+
+  public Product updateById(int id, ProductDTO newProductDTO) throws ResponseStatusException {
+    if (this.productWithNameExists(newProductDTO.name()))
+      throw new ResponseStatusException(HttpStatus.I_AM_A_TEAPOT);
+
+    Product oldProduct = this.getById(id);
+    this.products.remove(oldProduct);
+
+    Product newProduct = new Product(id, newProductDTO.name(), newProductDTO.category(), newProductDTO.price());
+    this.products.add(newProduct);
+
+    return newProduct;
   }
 }

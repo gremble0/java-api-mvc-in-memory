@@ -38,14 +38,9 @@ public class ProductController {
   }
 
   @PutMapping(value = "/{id}")
-  public ResponseEntity<Product> updateById(@PathVariable int id, @RequestBody ProductDTO newProduct)
+  public ResponseEntity<Product> updateById(@PathVariable int id, @RequestBody ProductDTO newProductDTO)
       throws ResponseStatusException {
-    // TODO: make update instead of remove + post
-    // TODO: look into http status codes here - 400/404
-    Product oldProduct = this.repository.removeById(id);
-
-    return new ResponseEntity<>(this.repository.create(newProduct.name(), newProduct.category(),
-        newProduct.price()), HttpStatus.CREATED);
+    return new ResponseEntity<>(this.repository.updateById(id, newProductDTO), HttpStatus.CREATED);
   }
 
   @DeleteMapping(value = "/{id}")
