@@ -1,7 +1,6 @@
 package com.booleanuk.api.products;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,67 +13,43 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping(value = "/products")
 public class ProductController {
   private ProductRepository repository = new ProductRepository();
 
-  // TODO: ResponseEntity<Product> instead of '?'
   @PostMapping
-  public ResponseEntity<?> create(@RequestBody ProductDTO product) {
-    Optional<Product> productWithId = this.repository.create(product.name(), product.category(), product.price());
-
-    if (productWithId.isEmpty())
-      return new ResponseEntity<>("Product with provided name already exists", HttpStatus.BAD_REQUEST);
-    else
-      return new ResponseEntity<>(productWithId.get(), HttpStatus.CREATED);
+  public ResponseEntity<Product> create(@RequestBody ProductDTO product) throws ResponseStatusException {
+    return new ResponseEntity<>(this.repository.create(product.name(), product.category(), product.price()),
+        HttpStatus.CREATED);
   }
 
   @GetMapping
-  public ResponseEntity<?> getCategoryOrAll(@RequestParam(required = false) String category) {
-    Optional<List<Product>> ofCategory = this.repository.getAllOfCategory(category);
-
-    if (ofCategory.isEmpty())
-      return new ResponseEntity<>(this.repository.getAll(), HttpStatus.NOT_FOUND);
-    else
-      return new ResponseEntity<>(ofCategory, HttpStatus.OK);
+  public ResponseEntity<List<Product>> getCategoryOrAll(@RequestParam(required = false) String category)
+      throws ResponseStatusException {
+    return new ResponseEntity<>(this.repository.getAllOfCategory(category), HttpStatus.OK);
   }
 
   @GetMapping(value = "/{id}")
-  public ResponseEntity<?> getById(@PathVariable int id) {
-    Optional<Product> product = this.repository.getById(id);
-
-    if (product.isEmpty())
-      return new ResponseEntity<>("No product with id '" + id + "' found", HttpStatus.NOT_FOUND);
-    else
-      return new ResponseEntity<>(product.get(), HttpStatus.OK);
+  public ResponseEntity<Product> getById(@PathVariable int id) throws ResponseStatusException {
+    return new ResponseEntity<>(this.repository.getById(id), HttpStatus.OK);
   }
 
   @PutMapping(value = "/{id}")
-  public ResponseEntity<?> updateById(@PathVariable int id, @RequestBody ProductDTO newProduct) {
-    Optional<Product> oldProduct = this.repository.removeById(id);
+  public ResponseEntity<Product> updateById(@PathVariable int id, @RequestBody ProductDTO newProduct)
+      throws ResponseStatusException {
+    // TODO: make update instead of remove + post
+    // TODO: look into http status codes here - 400/404
+    Product oldProduct = this.repository.removeById(id);
 
-    if (oldProduct.isEmpty())
-      return new ResponseEntity<>("No product with id '" + id + "' found", HttpStatus.NOT_FOUND);
-
-    Optional<Product> createdProduct = this.repository.create(newProduct.name(), newProduct.category(),
-        newProduct.price());
-
-    if (createdProduct.isEmpty())
-      return new ResponseEntity<>("Product with name '" + newProduct.name() + "' already exists",
-          HttpStatus.BAD_REQUEST);
-    else
-      return new ResponseEntity<>(createdProduct.get(), HttpStatus.OK);
+    return new ResponseEntity<>(this.repository.create(newProduct.name(), newProduct.category(),
+        newProduct.price()), HttpStatus.CREATED);
   }
 
   @DeleteMapping(value = "/{id}")
-  public ResponseEntity<?> removeById(@PathVariable int id) {
-    Optional<Product> product = this.repository.removeById(id);
-
-    if (product.isEmpty())
-      return new ResponseEntity<>("No product with id '" + id + "' found", HttpStatus.NOT_FOUND);
-    else
-      return new ResponseEntity<>(product.get(), HttpStatus.OK);
+  public ResponseEntity<Product> removeById(@PathVariable int id) throws ResponseStatusException {
+    return new ResponseEntity<>(this.repository.removeById(id), HttpStatus.OK);
   }
 }
