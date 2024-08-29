@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class ProductRepository {
   private int idCounter = 0;
   private List<Product> products = new ArrayList<>();
+  private static final String teapotTag = "<img src='https://media2.giphy.com/media/ARmZmMqobLtZKrJRrU/200w.gif?cid=6c09b95287okszcbz59ao584wd835y08z53ju0u1pwjpok20&ep=v1_gifs_search&rid=200w.gif&ct=g'>";
 
   public List<Product> getAll() {
     return this.products;
@@ -28,14 +29,14 @@ public class ProductRepository {
         .toList();
 
     if (ofCategory.size() == 0 && this.products.size() > 0)
-      throw new ResponseStatusException(HttpStatus.I_AM_A_TEAPOT);
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     else
       return ofCategory;
   }
 
   public Product create(String name, String category, int price) throws ResponseStatusException {
     if (this.productWithNameExists(name))
-      throw new ResponseStatusException(HttpStatus.I_AM_A_TEAPOT);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 
     Product product = new Product(this.idCounter++, name, category, price);
     this.products.add(product);
@@ -48,7 +49,7 @@ public class ProductRepository {
         .stream()
         .filter(product -> product.id() == id)
         .findFirst().orElseThrow(() -> {
-          throw new ResponseStatusException(HttpStatus.I_AM_A_TEAPOT);
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         });
   }
 
@@ -60,8 +61,9 @@ public class ProductRepository {
 
   public Product updateById(int id, ProductDTO newProductDTO) throws ResponseStatusException {
     if (this.productWithNameExists(newProductDTO.name()))
-      throw new ResponseStatusException(HttpStatus.I_AM_A_TEAPOT);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 
+    // Can throw 404
     Product oldProduct = this.getById(id);
     this.products.remove(oldProduct);
 
@@ -69,5 +71,9 @@ public class ProductRepository {
     this.products.add(newProduct);
 
     return newProduct;
+  }
+
+  public String getTeapotTag() {
+    return ProductRepository.teapotTag;
   }
 }

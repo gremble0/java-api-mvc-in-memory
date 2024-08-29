@@ -47,4 +47,9 @@ public class ProductController {
   public ResponseEntity<Product> removeById(@PathVariable int id) throws ResponseStatusException {
     return new ResponseEntity<>(this.repository.removeById(id), HttpStatus.OK);
   }
+
+  @GetMapping(value = "/418")
+  public ResponseEntity<String> getTeapot() {
+    return new ResponseEntity<>(this.repository.getTeapotTag(), HttpStatus.I_AM_A_TEAPOT);
+  }
 }
