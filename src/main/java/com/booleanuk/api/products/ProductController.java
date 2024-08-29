@@ -41,9 +41,9 @@ public class ProductController {
   }
 
   @PutMapping(value = "/{id}")
-  public ResponseEntity<Product> updateById(@PathVariable int id, @RequestBody ProductDTO newProductDTO)
+  public ResponseEntity<Product> updateById(@PathVariable int id, @RequestBody ProductDTO productDTO)
       throws ResponseStatusException {
-    return new ResponseEntity<>(this.repository.updateById(id, newProductDTO), HttpStatus.CREATED);
+    return new ResponseEntity<>(this.repository.updateById(id, productDTO), HttpStatus.CREATED);
   }
 
   @DeleteMapping(value = "/{id}")
@@ -51,6 +51,7 @@ public class ProductController {
     return new ResponseEntity<>(this.repository.removeById(id), HttpStatus.OK);
   }
 
+  // Not part of the assignment
   @GetMapping(value = "/418")
   public ResponseEntity<String> getTeapot() {
     return new ResponseEntity<>(this.repository.getTeapotTag(), HttpStatus.I_AM_A_TEAPOT);

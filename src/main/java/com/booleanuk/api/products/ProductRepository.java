@@ -12,13 +12,8 @@ public class ProductRepository {
   private static final String teapotTag = "<img src='https://media2.giphy.com/media/ARmZmMqobLtZKrJRrU/200w.gif?cid=6c09b95287okszcbz59ao584wd835y08z53ju0u1pwjpok20&ep=v1_gifs_search&rid=200w.gif&ct=g'>";
 
   private boolean productWithNameExists(String name) {
-    return this.products
-        .stream()
+    return this.products.stream()
         .anyMatch(product -> product.name().equals(name));
-  }
-
-  private Product productFromDTO(ProductDTO productDTO) {
-    return new Product(this.idCounter++, productDTO.name(), productDTO.category(), productDTO.price());
   }
 
   public List<Product> getAll() {
@@ -26,8 +21,7 @@ public class ProductRepository {
   }
 
   public List<Product> getCategory(String category) throws ResponseStatusException {
-    List<Product> ofCategory = this.products
-        .stream()
+    List<Product> ofCategory = this.products.stream()
         .filter(product -> product.category().equalsIgnoreCase(category))
         .toList();
 
@@ -45,15 +39,14 @@ public class ProductRepository {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
           "Product with name '" + productDTO.name() + "' already exists");
 
-    Product product = this.productFromDTO(productDTO);
+    Product product = new Product(this.idCounter++, productDTO.name(), productDTO.category(), productDTO.price());
     this.products.add(product);
 
     return product;
   }
 
   public Product getById(int id) throws ResponseStatusException {
-    return this.products
-        .stream()
+    return this.products.stream()
         .filter(product -> product.id() == id)
         .findFirst()
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product with id '" + id + "' not found"));
@@ -75,7 +68,7 @@ public class ProductRepository {
     Product oldProduct = this.getById(id);
     this.products.remove(oldProduct);
 
-    Product newProduct = this.productFromDTO(productDTO);
+    Product newProduct = new Product(oldProduct.id(), productDTO.name(), productDTO.category(), productDTO.price());
     this.products.add(newProduct);
 
     return newProduct;
