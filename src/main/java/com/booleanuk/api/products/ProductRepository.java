@@ -20,6 +20,9 @@ public class ProductRepository {
     return this.products;
   }
 
+  /**
+   * @throws ResponseStatusException HTTP error 404
+   */
   public List<Product> getCategory(String category) throws ResponseStatusException {
     List<Product> ofCategory = this.products.stream()
         .filter(product -> product.category().equalsIgnoreCase(category))
@@ -34,6 +37,9 @@ public class ProductRepository {
       return ofCategory;
   }
 
+  /**
+   * @throws ResponseStatusException HTTP error 400
+   */
   public Product create(ProductDTO productDTO) throws ResponseStatusException {
     if (this.productWithNameExists(productDTO.name()))
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -45,6 +51,9 @@ public class ProductRepository {
     return product;
   }
 
+  /**
+   * @throws ResponseStatusException HTTP error 404
+   */
   public Product getById(int id) throws ResponseStatusException {
     return this.products.stream()
         .filter(product -> product.id() == id)
@@ -52,19 +61,23 @@ public class ProductRepository {
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product with id '" + id + "' not found"));
   }
 
+  /**
+   * @throws ResponseStatusException HTTP error 404
+   */
   public Product removeById(int id) throws ResponseStatusException {
-    // Can throw 404
     Product toRemove = this.getById(id);
     this.products.remove(toRemove);
     return toRemove;
   }
 
+  /**
+   * @throws ResponseStatusException HTTP error 404 or 400
+   */
   public Product updateById(int id, ProductDTO productDTO) throws ResponseStatusException {
     if (this.productWithNameExists(productDTO.name()))
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
           "Product with name '" + productDTO.name() + "' already exists");
 
-    // Can throw 404
     Product oldProduct = this.getById(id);
     this.products.remove(oldProduct);
 
