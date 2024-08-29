@@ -16,16 +16,17 @@ public class ProductRepository {
   }
 
   private boolean productWithNameExists(String name) {
-    return this.products.stream()
+    return this.products
+        .stream()
         .filter(product -> product.name().equals(name))
         .findAny()
         .isPresent();
   }
 
-  public List<Product> getAllOfCategory(String category) throws ResponseStatusException {
+  public List<Product> getCategory(String category) throws ResponseStatusException {
     List<Product> ofCategory = this.products
         .stream()
-        .filter(product -> product.category().equals(category))
+        .filter(product -> product.category().equalsIgnoreCase(category))
         .toList();
 
     if (ofCategory.size() == 0 && this.products.size() > 0)
@@ -48,12 +49,14 @@ public class ProductRepository {
     return this.products
         .stream()
         .filter(product -> product.id() == id)
-        .findFirst().orElseThrow(() -> {
+        .findFirst()
+        .orElseThrow(() -> {
           throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         });
   }
 
   public Product removeById(int id) throws ResponseStatusException {
+    // Can throw 404
     Product toRemove = this.getById(id);
     this.products.remove(toRemove);
     return toRemove;

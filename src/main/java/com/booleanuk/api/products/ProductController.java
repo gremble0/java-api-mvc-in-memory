@@ -1,6 +1,7 @@
 package com.booleanuk.api.products;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +28,12 @@ public class ProductController {
   }
 
   @GetMapping
-  public ResponseEntity<List<Product>> getCategoryOrAll(@RequestParam(required = false) String category)
+  public ResponseEntity<List<Product>> getCategoryOrAll(@RequestParam(required = false) Optional<String> category)
       throws ResponseStatusException {
-    return new ResponseEntity<>(this.repository.getAllOfCategory(category), HttpStatus.OK);
+    if (category.isPresent())
+      return new ResponseEntity<>(this.repository.getCategory(category.get().toLowerCase()), HttpStatus.OK);
+    else
+      return new ResponseEntity<>(this.repository.getAll(), HttpStatus.OK);
   }
 
   @GetMapping(value = "/{id}")
