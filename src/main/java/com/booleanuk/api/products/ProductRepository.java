@@ -13,7 +13,7 @@ public class ProductRepository {
 
   private boolean productWithNameExists(String name) {
     return this.products.stream()
-        .anyMatch(product -> product.name().equals(name));
+        .anyMatch(product -> product.name().equalsIgnoreCase(name));
   }
 
   public List<Product> getAll() {
@@ -85,10 +85,8 @@ public class ProductRepository {
           "Product with name '" + productDTO.name() + "' already exists");
 
     Product oldProduct = this.getById(id);
-    this.products.remove(oldProduct);
-
     Product newProduct = new Product(oldProduct.id(), productDTO.name(), productDTO.category(), productDTO.price());
-    this.products.add(newProduct);
+    this.products.set(this.products.indexOf(oldProduct), newProduct);
 
     return newProduct;
   }
